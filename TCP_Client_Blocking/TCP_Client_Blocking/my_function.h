@@ -25,4 +25,18 @@ bool ProcessConnection(SOCKET sd);
 //若成功,返回true;否者返回false.
 bool ShutdownConnection(SOCKET sd);
 
+//完整发送数据
+//s: 已连接套接字
+//data: 数据起始地址
+//数据大小
+//若成功发送,返回true;否者返回false.
+bool CompleteSend(SOCKET s, const char *data, int len);
+
+//完整接收数据
+//s : 已连接套接字
+//buffer : 数据起始地址
+//len :"数据大小
+//若成功接收,返回true;否者返回false.
+bool CompleteRecv(SOCKET s, char *buffer, int len);
+
 #endif
