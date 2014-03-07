@@ -47,7 +47,7 @@ void DoWork(const char* szServer, int nPort)
 	SOCKET sd = ConnectServer(nServerAddr, htons(nPort));
 	if (INVALID_SOCKET == sd)
 	{
-		cout << "socket error " << WSAGetLastError() << endl;
+		cout << "socket error : " << WSAGetLastError() << endl;
 	}
 
 	//第二阶段,处理回显业务逻辑
