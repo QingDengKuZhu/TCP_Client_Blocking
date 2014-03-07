@@ -8,7 +8,7 @@
 #define  DEF_PORT			10000
 
 //将用户在命令行似乎入的地址转换成整数地址.用户输入的地址可以有两种形式:点分十进制(如 192.0.0.1)和主句名称形式(如localhost).
-//若成功,返回地址;失败返回INADDR_NONE.
+//若成功,返回表示的服务器地址(主句字节序);失败返回INADDR_NONE.
 u_long ResoleAddress(const char* szServer);
 
 //客户端主体函数
@@ -16,7 +16,7 @@ void DoWork(const char* szServer, int nPort);
 
 //连接服务器.
 //若成功,返回连接句柄 否者,返回INVALID_SOCKET.
-SOCKET ConnectServer(u_long ServerAddr, int nPort);
+SOCKET ConnectServer(u_long nServerAddr, int nPort);
 
 //处理回显业务逻辑
 //若成功,返回true;否者返回false

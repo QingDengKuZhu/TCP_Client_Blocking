@@ -30,9 +30,8 @@ u_long ResoleAddress(const char* szServer)
 		cout << "Error resolving address !" << endl; 
 	}
 
-	return nAddr;
+	return ntohl(nAddr);	//必须转换成主机字节序!!!
 }
-
 
 void DoWork(const char* szServer, int nPort)
 {
@@ -42,12 +41,13 @@ void DoWork(const char* szServer, int nPort)
 	{
 		return;
 	}
-
+	
 	//第一阶段, 连接服务器
-	SOCKET sd = ConnectServer(nServerAddr, htons(nPort));
+	SOCKET sd = ConnectServer(nServerAddr, nPort);
 	if (INVALID_SOCKET == sd)
 	{
-		cout << "socket error : " << WSAGetLastError() << endl;
+		cout << "ConnectServer error : " << WSAGetLastError() << endl;
+		return;
 	}
 
 	//第二阶段,处理回显业务逻辑
@@ -60,7 +60,7 @@ void DoWork(const char* szServer, int nPort)
 	return;
 }
 
-SOCKET ConnectServer(u_long ServerAddr, int nPort)
+SOCKET ConnectServer(u_long nServerAddr, int nPort)
 {
 	SOCKET sd =  socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (INVALID_SOCKET == sd)
@@ -68,14 +68,13 @@ SOCKET ConnectServer(u_long ServerAddr, int nPort)
 		cout << "socket error : " << WSAGetLastError() << endl;
 		return INVALID_SOCKET;
 	}
-
+	
 	sockaddr_in AddrServer = {0};
 	//填充服务器端套接字地址
 	AddrServer.sin_family = AF_INET;
-	AddrServer.sin_addr.S_un.S_addr = htonl(ServerAddr);
+	AddrServer.sin_addr.S_un.S_addr = htonl(nServerAddr);
 	AddrServer.sin_port = htons(nPort);
 	
-
 	//连接服务器
 	if ( SOCKET_ERROR == connect(sd, (const sockaddr *)&AddrServer, sizeof(sockaddr)) )
 	{
@@ -145,7 +144,7 @@ bool CompleteRecv(SOCKET s, char *buffer, int len)
 bool ProcessConnection(SOCKET sd)
 {
 	char buff[BUFFER_SIZE] = {0};
-	
+	cout << "Please input data : " << endl; 
 	//直到用户输入Ctrl+Z为止
 	while (cin>>buff)
 	{
