@@ -11,11 +11,10 @@
 u_long ResoleAddress(const char* szServer);
 
 //客户端主体函数
-
 void DoWork(const char* szServer, int nPort);
 
 //连接服务器.
-//若成功,返回连接
+//若成功,返回连接句柄 否者,返回INVALID_SOCKET.
 SOCKET ConnectServer(u_long ServerAddr, int nPort);
 
 //处理回显业务逻辑
