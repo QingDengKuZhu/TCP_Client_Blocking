@@ -91,10 +91,11 @@ SOCKET ConnectServer(u_long ServerAddr, int nPort)
 bool CompleteSend(SOCKET s, const char *data, int len)
 {
 	int idex = 0;
-	
-		while (idex < len)
+	char *p = (char *)data;
+
+	while (idex < len)
 	{
-		int nTemp = send(s, data[idex], len-idex, 0);
+		int nTemp = send(s, p+idex, len-idex, 0);
 		if (nTemp > 0)
 		{
 			idex += nTemp;
@@ -108,7 +109,9 @@ bool CompleteSend(SOCKET s, const char *data, int len)
 			cout << "Connection closed unexpectedly by peer." << endl;
 			return true;
 		}
-	}	
+	}
+
+	return true;	//当传入的len为0时,将执行此语句
 }
 
 bool CompleteRecv(SOCKET s, char *buffer, int len)
@@ -134,6 +137,9 @@ bool CompleteRecv(SOCKET s, char *buffer, int len)
 			return true;
 		}
 	}
+	//当传入的len为0时,将执行此语句
+	
+	return true;
 }
 
 bool ProcessConnection(SOCKET sd)
@@ -145,7 +151,7 @@ bool ProcessConnection(SOCKET sd)
 	{
 		if (false == CompleteSend(sd, buff, (int)strlen(buff)))
 		{
-			return false
+			return false;
 		}
 
 		if (false == CompleteRecv(sd, buff, (int)strlen(buff)))
@@ -155,6 +161,40 @@ bool ProcessConnection(SOCKET sd)
 
 		buff[(int)strlen(buff)] = '\0';
 		cout << buff << endl;
+	}
+
+	return true;
+}
+
+bool ShutdownConnection(SOCKET sd)
+{
+	if (SOCKET_ERROR == shutdown(sd, SD_SEND))
+	{
+		cout << "shutdown error : " << WSAGetLastError() << endl;
+		return false;
+	}
+	
+	char buff[BUFFER_SIZE] = {0};
+	int result = 0;
+	
+	do 
+	{
+		result = recv(sd, buff, BUFFER_SIZE, 0);
+		if (SOCKET_ERROR == result)
+		{
+			cout << "recv error : " << WSAGetLastError() << endl;
+			return false;
+		}
+		else if (result > 0)
+		{
+			cout << result << "unexpected bytes received." << endl;
+		}
+	} while (0 != result);
+
+	if (SOCKET_ERROR == closesocket(sd))
+	{
+			cout << "closesocket error : " << WSAGetLastError() << endl;
+			return false;
 	}
 
 	return true;
