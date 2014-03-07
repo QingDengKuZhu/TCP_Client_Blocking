@@ -5,6 +5,7 @@
 #include <iostream>
 
 #define  BUFFER_SIZE		SO_MAX_MSG_SIZE	//缓冲区大小
+#define  DEF_PORT			10000
 
 //将用户在命令行似乎入的地址转换成整数地址.用户输入的地址可以有两种形式:点分十进制(如 192.0.0.1)和主句名称形式(如localhost).
 //若成功,返回地址;失败返回INADDR_NONE.
