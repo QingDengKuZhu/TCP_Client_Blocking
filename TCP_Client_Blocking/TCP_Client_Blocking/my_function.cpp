@@ -99,14 +99,10 @@ bool CompleteSend(SOCKET s, const char *data, int len)
 		{
 			idex += nTemp;
 		}
-		else if (nTemp == SOCKET_ERROR)
+		else
 		{
 			cout << "send error : " << WSAGetLastError() << endl;
-		}
-		else	//nTemp==0表示连接关闭
-		{
-			cout << "Connection closed unexpectedly by peer." << endl;
-			return true;
+			return false;
 		}
 	}
 
