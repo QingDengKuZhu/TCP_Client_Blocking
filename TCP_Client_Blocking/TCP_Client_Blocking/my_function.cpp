@@ -11,7 +11,7 @@ u_long ResoleAddress(const char* szServer)
 	//首先尝试使用inet_addr来转换点分十进制地址,如果返回的是INADDR_NONE.
 	//则表明szServer使用的是主机名称形式,此时需要调用gethostbyname来查询起地址
 
-	u_long nAddr = inet_addr(szServer);
+	u_long nAddr = inet_addr(szServer);//返回的是网络字节序
 	if (INADDR_NONE == nAddr)
 	{
 		hostent *ent = gethostbyname(szServer);
@@ -36,14 +36,14 @@ u_long ResoleAddress(const char* szServer)
 void DoWork(const char* szServer, int nPort)
 {
 	//处理地址数据
-	u_long nServerAddr = ResoleAddress(szServer);
+	u_long nServerAddr = ResoleAddress(szServer);//返回的是主机字节序
 	if (INADDR_NONE == nServerAddr)
 	{
 		return;
 	}
 	
 	//第一阶段, 连接服务器
-	SOCKET sd = ConnectServer(nServerAddr, nPort);
+	SOCKET sd = ConnectServer(nServerAddr, nPort);//已连接套接字
 	if (INVALID_SOCKET == sd)
 	{
 		cout << "ConnectServer error : " << WSAGetLastError() << endl;
@@ -87,14 +87,13 @@ SOCKET ConnectServer(u_long nServerAddr, int nPort)
 	return sd;
 }
 
-bool CompleteSend(SOCKET s, const char *data, int len)
+bool CompleteSend(SOCKET sd, const char *data, int len)
 {
 	int idex = 0;
-	char *p = (char *)data;
 
 	while (idex < len)
 	{
-		int nTemp = send(s, p+idex, len-idex, 0);
+		int nTemp = send(sd, data+idex, len-idex, 0);
 		if (nTemp > 0)
 		{
 			idex += nTemp;
@@ -109,12 +108,12 @@ bool CompleteSend(SOCKET s, const char *data, int len)
 	return true;	//当传入的len为0时,将执行此语句
 }
 
-bool CompleteRecv(SOCKET s, char *buffer, int len)
+bool CompleteRecv(SOCKET sd, char *buffer, int len)
 {
 	int idex = 0;
 	while (idex < len)
 	{
-		int nTemp = recv(s, buffer, len-idex, 0);
+		int nTemp = recv(sd, buffer+idex, len-idex, 0);
 		if (nTemp == SOCKET_ERROR)
 		{
 			cout << "recv error : " <<WSAGetLastError() << endl;
